@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react"; // changed useLayoutEffect to useEffect
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import AButton from "./AButton";
+import { useEffect, useRef, useState } from "react"; // changed useLayoutEffect to useEffect
+
+import AButton from "./a-button";
 
 // Register explicitly outside component
 gsap.registerPlugin(ScrollTrigger);
@@ -24,7 +25,7 @@ const servicesData = [
       "IT Consulting & Advisory",
       "Network Infrastructure",
     ],
-    href: "/IT-Services",
+    href: "/it-services",
   },
   {
     id: 2,
@@ -39,7 +40,7 @@ const servicesData = [
       "Digital Compliance & Verification",
       "Smart Tracking & Monitoring",
     ],
-    href: "/Vehicle-Administration",
+    href: "/vehicle-administration",
   },
   {
     id: 3,
@@ -54,7 +55,7 @@ const servicesData = [
       "Speed & Movement Patterns",
       "Ridership (Origin-Destination)",
     ],
-    href: "/Vehicle-Administration",
+    href: "/vehicle-administration",
   },
   {
     id: 4,
@@ -69,7 +70,7 @@ const servicesData = [
       "System Integration",
       "Disaster Recovery",
     ],
-    href: "/IT-Services",
+    href: "/it-services",
   },
 ];
 
@@ -85,7 +86,8 @@ export default function ServicesCarousel() {
 
   useEffect(() => {
     // Changed to useEffect
-    if (!isMounted) return;
+    if (!isMounted)
+      return;
 
     const ctx = gsap.context(() => {
       const slides = slidesRef.current;
@@ -120,7 +122,8 @@ export default function ServicesCarousel() {
 
       // Build the animation sequence
       servicesData.forEach((_, i) => {
-        if (i === 0) return; // Skip first slide
+        if (i === 0)
+          return; // Skip first slide
 
         const currentSlide = slides[i];
         const prevSlide = slides[i - 1];

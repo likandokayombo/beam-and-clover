@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import gsap from "gsap";
+import { useEffect } from "react";
 
 export default function BodySvg() {
   useEffect(() => {
@@ -18,22 +18,22 @@ export default function BodySvg() {
       .to(
         "#car1",
         { rotation: 180, transformOrigin: "center center", duration: 0.7 },
-        "rotate"
+        "rotate",
       )
       .to(
         "#car2",
         { rotation: -180, transformOrigin: "center center", duration: 0.7 },
-        "rotate"
+        "rotate",
       )
       .to(
         "#car3",
         { rotation: 180, transformOrigin: "center center", duration: 0.7 },
-        "rotate"
+        "rotate",
       )
       .to(
         "#car4",
         { rotation: -180, transformOrigin: "center center", duration: 0.7 },
-        "rotate"
+        "rotate",
       )
 
       // MOVE BACK

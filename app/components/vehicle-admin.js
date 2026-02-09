@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
-import AButton from "./AButton";
-import VehicleVisual from "./VehicleVisual";
-import DeliveryRoute from "./DeliveryRoute";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+
+import AButton from "./a-button";
+import DeliveryRoute from "./delivery-route";
+import VehicleVisual from "./vehicle-visual";
 
 const style = `
   @keyframes fadeIn {
@@ -149,9 +150,9 @@ export default function VehicleAdmin() {
                     <div
                       key={index}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
-                        index === registrationPage
-                          ? "w-8 bg-foreground"
-                          : "w-2 bg-foreground/20"
+                        index === registrationPage ?
+                          "w-8 bg-foreground" :
+                          "w-2 bg-foreground/20"
                       }`}
                     />
                   ))}
@@ -515,9 +516,9 @@ export default function VehicleAdmin() {
                       <div
                         key={index}
                         className={`h-1.5 rounded-full transition-all duration-300 ${
-                          index === registrationPage
-                            ? "w-8 bg-foreground"
-                            : "w-2 bg-foreground/20"
+                          index === registrationPage ?
+                            "w-8 bg-foreground" :
+                            "w-2 bg-foreground/20"
                         }`}
                       />
                     ),
@@ -704,7 +705,8 @@ export default function VehicleAdmin() {
         if (diff > 0 && dragStartIndex.current < menuItems.length - 1) {
           // Swiped left, go to next item
           setActiveItem(menuItems[dragStartIndex.current + 1]);
-        } else if (diff < 0 && dragStartIndex.current > 0) {
+        }
+        else if (diff < 0 && dragStartIndex.current > 0) {
           // Swiped right, go to previous item
           setActiveItem(menuItems[dragStartIndex.current - 1]);
         }
@@ -786,7 +788,8 @@ export default function VehicleAdmin() {
                 <div
                   key={item}
                   ref={(el) => {
-                    if (el) desktopItemRefs.current[item] = el;
+                    if (el)
+                      desktopItemRefs.current[item] = el;
                   }}
                   onClick={() => setActiveItem(item)}
                   className={`
@@ -801,9 +804,9 @@ export default function VehicleAdmin() {
                 z-10
                 rounded-full
                 ${
-                  item === activeItem
-                    ? "text-foreground font-semibold"
-                    : "text-foreground/60 hover:text-foreground"
+                item === activeItem ?
+                  "text-foreground font-semibold" :
+                  "text-foreground/60 hover:text-foreground"
                 }
               `}
                 >
@@ -863,7 +866,8 @@ export default function VehicleAdmin() {
                 <div
                   key={item}
                   ref={(el) => {
-                    if (el) mobileItemRefs.current[item] = el;
+                    if (el)
+                      mobileItemRefs.current[item] = el;
                   }}
                   onClick={() => setActiveItem(item)}
                   className={`transition-all duration-300 cursor-pointer ${

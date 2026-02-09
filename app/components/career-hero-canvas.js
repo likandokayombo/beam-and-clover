@@ -1,6 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
+
 import CareerVisual from "./CareerVisual";
 
 export default function CareerHeroCanvas() {

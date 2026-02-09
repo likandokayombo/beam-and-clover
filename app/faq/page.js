@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { PointMaterial, Points } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import AButton from "../components/AButton";
+
+import AButton from "../components/a-button";
+import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
 // --- 3D Component: Morphing Nodes ---
-const MorphingNodes = () => {
+function MorphingNodes() {
   const ref = useRef();
   const [currentShapeIndex, setCurrentShapeIndex] = useState(0);
 
@@ -41,9 +42,12 @@ const MorphingNodes = () => {
         (Math.random() - 0.5) * 2 * radius,
         (Math.random() - 0.5) * 2 * radius,
       );
-      if (axis === 0) point.x = dir * radius;
-      if (axis === 1) point.y = dir * radius;
-      if (axis === 2) point.z = dir * radius;
+      if (axis === 0)
+        point.x = dir * radius;
+      if (axis === 1)
+        point.y = dir * radius;
+      if (axis === 2)
+        point.z = dir * radius;
       // Scale down slightly to match visual weight
       return point.multiplyScalar(0.7);
     };
@@ -92,7 +96,8 @@ const MorphingNodes = () => {
   const positions = useMemo(() => new Float32Array(count * 3), []);
 
   useFrame((state) => {
-    if (!ref.current) return;
+    if (!ref.current)
+      return;
 
     const time = state.clock.elapsedTime;
     // Calculate cycle
@@ -146,7 +151,7 @@ const MorphingNodes = () => {
       </Points>
     </group>
   );
-};
+}
 
 const CATEGORIES = [
   "All",
@@ -220,12 +225,12 @@ const FAQS = [
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: FAQS.map((faq) => ({
+  "mainEntity": FAQS.map((faq) => ({
     "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
+    "name": faq.question,
+    "acceptedAnswer": {
       "@type": "Answer",
-      text: faq.answer,
+      "text": faq.answer,
     },
   })),
 };
@@ -356,10 +361,10 @@ export default function FAQ() {
                     onClick={() => setActiveCategory(cat)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 font-medium flex justify-between items-center group
                     ${
-                      activeCategory === cat
-                        ? "bg-[#F48244]/10 text-[#F48244]"
-                        : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
-                    }`}
+                  activeCategory === cat ?
+                    "bg-[#F48244]/10 text-[#F48244]" :
+                    "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                  }`}
                   >
                     {cat}
                     {activeCategory === cat && (
@@ -394,22 +399,21 @@ export default function FAQ() {
                       key={faq.id}
                       className={`group border rounded-xl overflow-hidden transition-all duration-300 ease-out
                         ${
-                          expandedId === faq.id
-                            ? "border-[#F48244]/30 bg-foreground/[0.02]"
-                            : "border-foreground/10 bg-background hover:border-foreground/20"
-                        }`}
+                    expandedId === faq.id ?
+                      "border-[#F48244]/30 bg-foreground/[0.02]" :
+                      "border-foreground/10 bg-background hover:border-foreground/20"
+                    }`}
                     >
                       <button
                         onClick={() =>
-                          setExpandedId(expandedId === faq.id ? null : faq.id)
-                        }
+                          setExpandedId(expandedId === faq.id ? null : faq.id)}
                         className="w-full flex items-start gap-6 p-6 text-left focus:outline-none"
                       >
                         <span
                           className={`font-mono text-xs mt-1 transition-colors duration-300 ${
-                            expandedId === faq.id
-                              ? "text-[#F48244]"
-                              : "text-foreground/30"
+                            expandedId === faq.id ?
+                              "text-[#F48244]" :
+                              "text-foreground/30"
                           }`}
                         >
                           {faq.id}
@@ -418,9 +422,9 @@ export default function FAQ() {
                         <div className="flex-1">
                           <h3
                             className={`text-lg font-medium pr-8 transition-colors duration-300 ${
-                              expandedId === faq.id
-                                ? "text-foreground"
-                                : "text-foreground/80"
+                              expandedId === faq.id ?
+                                "text-foreground" :
+                                "text-foreground/80"
                             }`}
                           >
                             {faq.question}
@@ -428,9 +432,9 @@ export default function FAQ() {
 
                           <div
                             className={`grid transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
-                              expandedId === faq.id
-                                ? "grid-rows-[1fr] opacity-100 mt-4"
-                                : "grid-rows-[0fr] opacity-0 mt-0"
+                              expandedId === faq.id ?
+                                "grid-rows-[1fr] opacity-100 mt-4" :
+                                "grid-rows-[0fr] opacity-0 mt-0"
                             }`}
                           >
                             <div className="overflow-hidden">
@@ -451,9 +455,9 @@ export default function FAQ() {
                         {/* Expand Icon */}
                         <div
                           className={`flex-shrink-0 w-6 h-6 rounded-full border border-foreground/10 flex items-center justify-center transition-colors duration-300 ${
-                            expandedId === faq.id
-                              ? "bg-[#F48244] border-[#F48244] text-white"
-                              : "bg-transparent text-foreground/40 group-hover:border-foreground/30"
+                            expandedId === faq.id ?
+                              "bg-[#F48244] border-[#F48244] text-white" :
+                              "bg-transparent text-foreground/40 group-hover:border-foreground/30"
                           }`}
                         >
                           <svg
