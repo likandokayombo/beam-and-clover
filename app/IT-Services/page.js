@@ -1,6 +1,6 @@
-import Navbar from "@/app/components/Navbar";
-import IT from "@/app/components/IT";
-import Footer from "@/app/components/Footer";
+import Footer from "@/app/components/footer";
+import IT from "@/app/components/it";
+import Navbar from "@/app/components/navbar";
 
 export const metadata = {
   title: "Enterprise IT & Infrastructure Services | Beam & Clover",
@@ -9,12 +9,11 @@ export const metadata = {
 };
 
 export default function Page() {
-
   return (
     <div>
       <Navbar />
-      <IT/>
-      <Footer/>
+      <IT />
+      <Footer />
     </div>
   );
 }

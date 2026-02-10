@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Maintenance & Codebase Cleanup
 
-## Getting Started
+This document outlines the steps taken to standardize component naming, fix import paths, and fully resolve ESLint issues across the project.
 
-First, run the development server:
+The goal of this process was to **enforce kebab-case naming conventions**, ensure **consistent imports**, and achieve a **clean linting state** across the entire codebase.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Summary of Changes
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- Enforced **kebab-case** naming for components and files
+- Updated all related **import paths** across pages and components
+- Resolved **ESLint configuration issues**
+- Achieved a **lint-clean codebase** using automated and manual fixes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Step-by-Step Process
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Documentation Updates
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Updated `task.md` and `implementation_plan.md` to reflect the cleanup strategy and scope.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Codebase Audit
 
-## Deploy on Vercel
+- Listed all files to identify component and file naming violations.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Component Renaming
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Renamed components to **kebab-case** using `git mv` to preserve Git history.
+
+### 4. Initial Import Updates
+
+- Updated imports to kebab-case in `app/page.js` and related files.
+
+### 5. Cross-Page Import Fixes
+
+- Updated imports in other page files and shared components.
+
+### 6. Continued Import Validation
+
+- Updated imports in remaining pages and verified component usage.
+
+### 7. Section-Specific Updates
+
+- Updated imports in:
+  - `contact`
+  - `case-studies`
+  - `careers`
+  - `blog` pages
+
+### 8. Internal Component Cleanup
+
+- Updated remaining pages and fixed internal component imports.
+
+### 9. Lint Error Resolution
+
+- Resolved linting errors caused by renamed components and paths.
+
+### 10. Route & Path Refinement
+
+- Updated internal imports and refined route paths for consistency.
+
+### 11. Final Component Scan
+
+- Completed a full internal component scan.
+- Ran auto-linting fixes where applicable.
+
+### 12. Global Linting Pass
+
+- Updated final component imports.
+- Started global linting cleanup.
+
+### 13. Automated Lint Fixes
+
+- Ran:
+  ```bash
+  pnpm lint --fix
+  ```

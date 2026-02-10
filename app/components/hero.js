@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import AButton from "./AButton";
-import { useEffect, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import PixelTransition from "./PixelTransition";
+import { useEffect } from "react";
+
+import AButton from "./a-button";
+import PixelTransition from "./pixel-transition";
 
 export default function Hero() {
-  const [activeCategory, setActiveCategory] = useState(0);
-
   useEffect(() => {
     // Gear 1 rotates clockwise
     gsap.to("#gear1", {

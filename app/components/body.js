@@ -1,9 +1,9 @@
 "use client";
 
-import AButton from "./AButton";
-import Image from "next/image"; // Re-import Image
-import Link from "next/link";
-import BodySvg from "./BodySvg";
+// Re-import Image
+
+import AButton from "./a-button";
+import BodySvg from "./body-svg";
 
 export default function Body() {
   return (

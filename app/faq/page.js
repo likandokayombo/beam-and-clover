@@ -1,252 +1,168 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
-import * as THREE from "three";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import AButton from "../components/AButton";
+import { useMemo, useState } from "react";
 
-// --- 3D Component: Morphing Nodes ---
-const MorphingNodes = () => {
-  const ref = useRef();
-  const [currentShapeIndex, setCurrentShapeIndex] = useState(0);
+import AButton from "../components/a-button";
+import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
-  // Configuration
-  const count = 2000; // Number of nodes
-  const radius = 2; // Base radius
-  const transitionDuration = 2.5; // Seconds per shape
-  const pauseDuration = 1; // Seconds to hold shape
-
-  // Generate target positions for 4 shapes
-  const shapes = useMemo(() => {
-    const getSpherePoint = () => {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = 2 * Math.PI * u;
-      const phi = Math.acos(2 * v - 1);
-      return new THREE.Vector3(
-        radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.sin(phi) * Math.sin(theta),
-        radius * Math.cos(phi),
-      );
-    };
-
-    const getCubePoint = () => {
-      const axis = Math.floor(Math.random() * 3);
-      const dir = Math.random() > 0.5 ? 1 : -1;
-      const point = new THREE.Vector3(
-        (Math.random() - 0.5) * 2 * radius,
-        (Math.random() - 0.5) * 2 * radius,
-        (Math.random() - 0.5) * 2 * radius,
-      );
-      if (axis === 0) point.x = dir * radius;
-      if (axis === 1) point.y = dir * radius;
-      if (axis === 2) point.z = dir * radius;
-      // Scale down slightly to match visual weight
-      return point.multiplyScalar(0.7);
-    };
-
-    const getTorusPoint = () => {
-      const u = Math.random() * Math.PI * 2;
-      const v = Math.random() * Math.PI * 2;
-      const tubeRadius = 0.6;
-      const ringRadius = 1.4;
-      return new THREE.Vector3(
-        (ringRadius + tubeRadius * Math.cos(v)) * Math.cos(u),
-        (ringRadius + tubeRadius * Math.cos(v)) * Math.sin(u),
-        tubeRadius * Math.sin(v),
-      );
-    };
-
-    const getIcosahedronPoint = () => {
-      // Approximate points on an Icosahedron (simplified to a double pyramid for visual distinction)
-      // Or simpler: a Tetrahedron or Pyramid
-      // Let's do a double cone / diamond shape
-      const h = (Math.random() - 0.5) * 2 * radius;
-      const r = (radius - Math.abs(h)) * 0.8; // Taper out then in
-      const angle = Math.random() * Math.PI * 2;
-      return new THREE.Vector3(r * Math.cos(angle), h, r * Math.sin(angle));
-    };
-
-    const generators = [
-      getSpherePoint,
-      getCubePoint,
-      getTorusPoint,
-      getIcosahedronPoint,
-    ];
-
-    return generators.map((gen) => {
-      const positions = new Float32Array(count * 3);
-      for (let i = 0; i < count; i++) {
-        const p = gen();
-        positions[i * 3] = p.x;
-        positions[i * 3 + 1] = p.y;
-        positions[i * 3 + 2] = p.z;
-      }
-      return positions;
-    });
-  }, []);
-
-  const positions = useMemo(() => new Float32Array(count * 3), []);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-
-    const time = state.clock.elapsedTime;
-    // Calculate cycle
-    const totalDuration = transitionDuration + pauseDuration;
-    const cycleTime = time % (totalDuration * 4); // 4 shapes
-    const shapeIndex = Math.floor(cycleTime / totalDuration);
-    const progressInCycle = (cycleTime % totalDuration) / transitionDuration;
-
-    // Clamp progress to 1 (handle pause)
-    const t = Math.min(progressInCycle, 1);
-    // Smooth easing
-    const smoothT = t * t * (3 - 2 * t);
-
-    const currentPositions = shapes[shapeIndex];
-    const nextPositions = shapes[(shapeIndex + 1) % 4];
-
-    // Interpolate positions
-    for (let i = 0; i < count; i++) {
-      const i3 = i * 3;
-      const cx = currentPositions[i3];
-      const cy = currentPositions[i3 + 1];
-      const cz = currentPositions[i3 + 2];
-
-      const nx = nextPositions[i3];
-      const ny = nextPositions[i3 + 1];
-      const nz = nextPositions[i3 + 2];
-
-      positions[i3] = cx + (nx - cx) * smoothT;
-      positions[i3 + 1] = cy + (ny - cy) * smoothT;
-      positions[i3 + 2] = cz + (nz - cz) * smoothT;
-    }
-
-    ref.current.geometry.attributes.position.needsUpdate = true;
-
-    // Rotate the whole cloud
-    ref.current.rotation.y = time * 0.2;
-    ref.current.rotation.x = Math.sin(time * 0.1) * 0.1;
-  });
-
-  return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#000"
-          size={0.04}
-          sizeAttenuation={true}
-          depthWrite={false}
-          opacity={0.8}
-        />
-      </Points>
-    </group>
-  );
+const Icons = {
+  Search: () => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  ),
+  Information: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </svg>
+  ),
+  ExternalLink: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" x2="21" y1="14" y2="3" />
+    </svg>
+  ),
 };
 
-const CATEGORIES = [
-  "All",
-  "General",
-  "Engagement",
-  "Billing",
-  "Technical",
-  "Support",
+const CONTACT_CHANNELS = [
+  {
+    name: "Legal Support",
+    email: "legal@beamandclover.com",
+    label: "Compliance & Licensing",
+  },
+  {
+    name: "Technical Desk",
+    email: "tech@beamandclover.com",
+    label: "IT & Systems",
+  },
+  {
+    name: "General Inquiry",
+    email: "hello@beamandclover.com",
+    label: "General Support",
+  },
 ];
 
 const FAQS = [
   {
-    id: "001",
-    category: "General",
-    question: "What defines the Beam & Clover architecture?",
+    id: "BC-101",
+    category: "Licensing",
+    question: "What is the standard processing time for a vehicle license?",
     answer:
-      "We build on a foundation of 'radical simplicity'. By minimizing dependencies and optimizing for edge computing, we ensure your infrastructure is not just fast, but instant. We prefer static generation, serverless functions, and immutable deployments.",
+      "Standard processing typically takes 3-5 business days from the moment of document submission. For bulk fleet applications, this can extend to 7-10 days depending on the volume and specific jurisdictional requirements.",
   },
   {
-    id: "002",
-    category: "Engagement",
-    question: "How do we collaborate on a daily basis?",
+    id: "BC-102",
+    category: "Licensing",
+    question: "Do you handle international vehicle importation licensing?",
     answer:
-      "We integrate directly into your Slack/Teams channels. No email chains. You get a dedicated linear board for tracking, and we ship previews with every pull request. Transparency is absolute.",
+      "Yes, we manage the complete cross-border compliance stack, including customs clearance documentation, regional homogenization permits, and initial registration within the target country.",
   },
   {
-    id: "003",
+    id: "BC-201",
+    category: "Compliance",
+    question: "How do you monitor changing local transport regulations?",
+    answer:
+      "Our system integrates directly with national transport databases and legislative feeds. We provide real-time updates to our clients via our compliance dashboard, highlighting any action items required for their specific fleet profile.",
+  },
+  {
+    id: "BC-202",
+    category: "Compliance",
+    question: "What happens if a vehicle in my fleet fails an audit?",
+    answer:
+      "We immediately move the vehicle into our 'Resolution Track'. This involves identifying the specific compliance gap, coordinating the necessary technical or administrative fix, and resubmitting for audit within 48 hours to minimize operational downtime.",
+  },
+  {
+    id: "BC-301",
+    category: "IT & Systems",
+    question: "Can your API integrate with existing ERP systems?",
+    answer:
+      "Absolutely. Our platform is built on a RESTful architecture with comprehensive GraphQL endpoints. We support native integrations with major ERPs like SAP, Oracle, and Microsoft Dynamics, as well as custom-built industrial solutions.",
+  },
+  {
+    id: "BC-302",
+    category: "IT & Systems",
+    question: "How secure is my fleet data on your platform?",
+    answer:
+      "We employ AES-256 at-rest encryption and TLS 1.3 for all data in transit. Our systems are SOC2 Type II compliant, with continuous 24/7 monitoring and automated threat detection protocols.",
+  },
+  {
+    id: "BC-401",
     category: "Billing",
-    question: "What is the cost structure?",
+    question: "Is there a bulk discount for fleet-wide registration?",
     answer:
-      "We operate on fixed-cost sprints or monthly retainers. This aligns our incentives: we don't profit from hours worked, but from value delivered. We scope, we agree, we ship. No surprise overages.",
-  },
-  {
-    id: "004",
-    category: "Technical",
-    question: "Do you handle legacy migrations?",
-    answer:
-      "Yes, but we don't just 'lift and shift'. We strangle the monolith. We systematically carve out services from your legacy stack and rebuild them in a modern environment, ensuring zero downtime during the transition.",
-  },
-  {
-    id: "005",
-    category: "Support",
-    question: "What happens after launch?",
-    answer:
-      "Code rots if left unattended. We offer ongoing 'Maintenance & Evolution' packages. We monitor performance metrics, update security patches, and optimize database queries proactively.",
-  },
-  {
-    id: "006",
-    category: "Scale",
-    question: "Can you handle enterprise-grade traffic?",
-    answer:
-      "Our systems are designed to auto-scale from zero to millions of requests per second. We utilize global CDNs and edge caching strategies used by giants like Vercel and Cloudflare.",
-  },
-  {
-    id: "007",
-    category: "Technical",
-    question: "What is your SLA for critical incidents?",
-    answer:
-      "For enterprise tiers, we offer a 1-hour response time SLA for critical severity issues (SEV-1). Our distributed team ensures 24/7 coverage for production-halting bugs.",
-  },
-  {
-    id: "008",
-    category: "Billing",
-    question: "Do you offer equity-based compensation?",
-    answer:
-      "We are open to hybrid models (cash + equity) for high-potential startups that pass our due diligence process. This requires a minimum 12-month engagement commitment.",
+      "Yes, we offer tiered pricing models based on fleet size. Volume discounts begin at 50+ vehicles, with significantly optimized rates for large-scale enterprise operations exceeding 500 units.",
   },
 ];
 
-// FAQ Schema for rich snippets in Google Search
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQS.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
+const CATEGORIES = ["All", "Licensing", "Compliance", "IT & Systems", "Billing"];
 
 export default function FAQ() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
 
-  const filteredFaqs = FAQS.filter((faq) => {
-    const matchesCategory =
-      activeCategory === "All" || faq.category === activeCategory;
-    const matchesSearch =
-      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredFaqs = useMemo(() => {
+    return FAQS.filter((faq) => {
+      const matchesCategory =
+        activeCategory === "All" || faq.category === activeCategory;
+      const matchesSearch =
+        faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        faq.id.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, searchQuery]);
+
+  // Generate structured data for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer,
+      },
+    })),
+  };
 
   return (
     <>
       {/* FAQ Schema for Google Rich Snippets */}
+      { }
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -293,222 +209,268 @@ export default function FAQ() {
                   </div>
                 </div>
                 <h1 className="text-6xl md:text-8xl font-bold tracking-tighter pt-4 md:pt-5  mb-8 text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/60">
-                  Protocol <br /> FAQ.
+                  Protocols & <br />
+                  <span className="italic font-serif font-light text-foreground/40">
+                    Resolution
+                  </span>
                 </h1>
-                <p className="text-lg text-foreground/60 leading-relaxed max-w-2xl mb-8">
-                  Find answers to common questions about our services{" "}
+                <p className="text-xl text-foreground/50 max-w-xl leading-relaxed mb-10 font-medium">
+                  Comprehensive documentation on our administrative framework,
+                  system compliance, and technical standards.
                 </p>
 
-                {/* Search Bar - Linear Style */}
-                <div className="relative max-w-xl group">
-                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <svg
-                      className="w-5 h-5 text-foreground/30 group-focus-within:text-[#F48244] transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
+                {/* Search Bar */}
+                <div className="relative max-w-2xl group">
+                  <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-foreground/20 group-focus-within:text-[#F48244] transition-colors">
+                    <Icons.Search />
                   </div>
                   <input
                     type="text"
-                    placeholder="Search protocol database..."
-                    className="w-full bg-foreground/5 border border-foreground/10 rounded-xl py-4 pl-12 pr-4 text-lg focus:outline-none focus:ring-1 focus:ring-[#F48244]/50 focus:border-[#F48244]/50 transition-all placeholder:text-foreground/30 font-mono text-sm"
+                    placeholder="Search protocols, categories, or IDs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-foreground/[0.03] border border-foreground/10 rounded-2xl py-6 pl-14 pr-6 text-lg focus:outline-none focus:ring-2 focus:ring-[#F48244]/20 focus:border-[#F48244]/40 transition-all placeholder:text-foreground/20"
                   />
-                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                    <span className="text-xs font-mono text-foreground/30 border border-foreground/10 px-1.5 py-0.5 rounded">
-                      ⌘K
-                    </span>
-                  </div>
                 </div>
               </div>
 
-              {/* <div className="w-full md:w-1/2 h-[400px] md:h-[500px] relative">
-              <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-transparent z-10 md:hidden" />
-              <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-                <ambientLight intensity={0.5} />
-                <MorphingNodes />
-              </Canvas>
-            </div> */}
+              {/* Right Decoration - Abstract UI Elements */}
+              <div className="hidden lg:block w-1/3 relative pointer-events-none opacity-20">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#F48244]/20 blur-[120px] rounded-full animate-pulse" />
+                <div className="space-y-4 font-mono text-[10px] text-foreground/30 uppercase tracking-widest">
+                  <div className="flex justify-between border-b border-foreground/5 pb-2">
+                    <span>System Status</span>
+                    <span className="text-green-500">Operational</span>
+                  </div>
+                  <div className="flex justify-between border-b border-foreground/5 pb-2">
+                    <span>Latent Sync</span>
+                    <span>14ms</span>
+                  </div>
+                  <div className="flex justify-between border-b border-foreground/5 pb-2">
+                    <span>Compliance Hub</span>
+                    <span>v.2.4.0</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
-          <div className="flex flex-col md:flex-row gap-12 lg:gap-24">
-            {/* Sidebar - Category Filter */}
-            <aside className="md:w-64 flex-shrink-0">
-              <div className="sticky top-32 space-y-1">
-                <h3 className="font-mono text-xs uppercase text-foreground/40 mb-4 px-3 tracking-widest">
-                  Filters
-                </h3>
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 font-medium flex justify-between items-center group
-                    ${
-                      activeCategory === cat
-                        ? "bg-[#F48244]/10 text-[#F48244]"
-                        : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
-                    }`}
-                  >
-                    {cat}
-                    {activeCategory === cat && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#F48244]" />
-                    )}
-                  </button>
-                ))}
+        {/* FAQ Navigation & List */}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-24">
+          <div className="flex flex-col lg:flex-row gap-20">
+            {/* Sidebar Filters */}
+            <aside className="lg:w-64 shrink-0 space-y-12">
+              <div>
+                <h4 className="text-xs font-mono uppercase tracking-[0.2em] text-foreground/30 mb-8 font-bold">
+                  Categories
+                </h4>
+                <nav className="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar pb-4 lg:pb-0">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap text-left transition-all ${
+                        activeCategory === cat ?
+                          "bg-[#F48244] text-white shadow-lg shadow-[#F48244]/20" :
+                          "text-foreground/50 hover:bg-foreground/5 hover:text-foreground"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/5">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-[#F48244] mb-4 font-bold">
+                  Need Assistance?
+                </h4>
+                <p className="text-xs text-foreground/40 leading-relaxed mb-6">
+                  Can't find what you're looking for? Our specialized teams are
+                  online.
+                </p>
+                <AButton
+                  href="/contact"
+                  className="w-full justify-center text-[10px] uppercase font-bold tracking-widest py-3"
+                  filled
+                >
+                  Open Ticket
+                </AButton>
               </div>
             </aside>
 
             {/* Main Content - FAQ List */}
             <div className="flex-1 min-h-[500px]">
-              {filteredFaqs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-foreground/40 border border-dashed border-foreground/10 rounded-xl">
-                  <p className="font-mono">
-                    No protocols found matching query.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      setActiveCategory("All");
-                    }}
-                    className="mt-4 text-sm text-[#F48244] hover:underline"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredFaqs.map((faq) => (
-                    <div
-                      key={faq.id}
-                      className={`group border rounded-xl overflow-hidden transition-all duration-300 ease-out
-                        ${
-                          expandedId === faq.id
-                            ? "border-[#F48244]/30 bg-foreground/[0.02]"
-                            : "border-foreground/10 bg-background hover:border-foreground/20"
-                        }`}
-                    >
+              {filteredFaqs.length === 0 ?
+                  (
+                    <div className="flex flex-col items-center justify-center h-64 text-foreground/40 border border-dashed border-foreground/10 rounded-xl">
+                      <p className="font-mono">
+                        No protocols found matching query.
+                      </p>
                       <button
-                        onClick={() =>
-                          setExpandedId(expandedId === faq.id ? null : faq.id)
-                        }
-                        className="w-full flex items-start gap-6 p-6 text-left focus:outline-none"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setActiveCategory("All");
+                        }}
+                        className="mt-4 text-sm text-[#F48244] hover:underline"
                       >
-                        <span
-                          className={`font-mono text-xs mt-1 transition-colors duration-300 ${
-                            expandedId === faq.id
-                              ? "text-[#F48244]"
-                              : "text-foreground/30"
-                          }`}
-                        >
-                          {faq.id}
-                        </span>
-
-                        <div className="flex-1">
-                          <h3
-                            className={`text-lg font-medium pr-8 transition-colors duration-300 ${
-                              expandedId === faq.id
-                                ? "text-foreground"
-                                : "text-foreground/80"
-                            }`}
-                          >
-                            {faq.question}
-                          </h3>
-
-                          <div
-                            className={`grid transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
-                              expandedId === faq.id
-                                ? "grid-rows-[1fr] opacity-100 mt-4"
-                                : "grid-rows-[0fr] opacity-0 mt-0"
-                            }`}
-                          >
-                            <div className="overflow-hidden">
-                              <p className="text-foreground/60 leading-relaxed text-base max-w-2xl">
-                                {faq.answer}
-                              </p>
-
-                              {/* Tag Pill */}
-                              <div className="mt-6 flex items-center gap-2">
-                                <span className="inline-flex items-center px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider bg-foreground/5 text-foreground/50 border border-foreground/5">
-                                  {faq.category}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Expand Icon */}
-                        <div
-                          className={`flex-shrink-0 w-6 h-6 rounded-full border border-foreground/10 flex items-center justify-center transition-colors duration-300 ${
-                            expandedId === faq.id
-                              ? "bg-[#F48244] border-[#F48244] text-white"
-                              : "bg-transparent text-foreground/40 group-hover:border-foreground/30"
-                          }`}
-                        >
-                          <svg
-                            className={`w-3 h-3 transition-transform duration-300 ${
-                              expandedId === faq.id ? "rotate-180" : "rotate-0"
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
+                        Reset Filters
                       </button>
                     </div>
-                  ))}
-                </div>
-              )}
+                  ) :
+                  (
+                    <div className="space-y-4">
+                      {filteredFaqs.map((faq) => (
+                        <div
+                          key={faq.id}
+                          className={`group border rounded-xl overflow-hidden transition-all duration-300 ease-out
+                        ${
+                        expandedId === faq.id ?
+                          "border-[#F48244]/30 bg-foreground/[0.02]" :
+                          "border-foreground/10 bg-background hover:border-foreground/20"
+                        }`}
+                        >
+                          <button
+                            onClick={() =>
+                              setExpandedId(expandedId === faq.id ? null : faq.id)}
+                            className="w-full flex items-start gap-6 p-6 text-left focus:outline-none"
+                          >
+                            <span
+                              className={`font-mono text-xs mt-1 transition-colors duration-300 ${
+                                expandedId === faq.id ?
+                                  "text-[#F48244]" :
+                                  "text-foreground/30"
+                              }`}
+                            >
+                              {faq.id}
+                            </span>
+
+                            <div className="flex-1">
+                              <h3
+                                className={`text-lg font-medium pr-8 transition-colors duration-300 ${
+                                  expandedId === faq.id ?
+                                    "text-foreground" :
+                                    "text-foreground/80"
+                                }`}
+                              >
+                                {faq.question}
+                              </h3>
+
+                              <div
+                                className={`grid transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
+                                  expandedId === faq.id ?
+                                    "grid-rows-[1fr] opacity-100 mt-4" :
+                                    "grid-rows-[0fr] opacity-0 mt-0"
+                                }`}
+                              >
+                                <div className="overflow-hidden">
+                                  <p className="text-foreground/60 leading-relaxed text-base max-w-2xl">
+                                    {faq.answer}
+                                  </p>
+
+                                  {/* Tag Pill */}
+                                  <div className="mt-6 flex items-center gap-2">
+                                    <span className="inline-flex items-center px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider bg-foreground/5 text-foreground/50 border border-foreground/5">
+                                      {faq.category}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div
+                              className={`mt-1 transition-transform duration-500 ${
+                                expandedId === faq.id ? "rotate-45" : ""
+                              }`}
+                            >
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={
+                                  expandedId === faq.id ?
+                                    "text-[#F48244]" :
+                                    "text-foreground/20"
+                                }
+                              >
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                              </svg>
+                            </div>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
             </div>
           </div>
         </div>
 
-        {/* Bottom CTA - System Error Style */}
-        <section className="py-12 md:py-24 px-6 md:px-12 border-t border-foreground/10 bg-foreground/[0.02]">
-          <div className="max-w-[1400px] mx-auto flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-[#F48244]/10 rounded-full flex items-center justify-center text-[#F48244] mb-6">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+        {/* Institutional Contact Section */}
+        <section className="bg-foreground text-background py-32 px-6 md:px-12">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
+              <div className="space-y-8">
+                <h2 className="text-4xl md:text-6xl font-bold tracking-tighter max-w-md">
+                  Direct <span className="italic font-serif font-light text-background/30">Channels</span>
+                </h2>
+                <p className="text-background/50 text-xl leading-relaxed max-w-lg">
+                  For matters requiring immediate escalation or specialized
+                  administrative override, please bypass the standard knowledge
+                  base and contact our departmental desks directly.
+                </p>
+                <div className="pt-8">
+                  <AButton href="/contact" filled showArrow>
+                    Contact Support
+                  </AButton>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {CONTACT_CHANNELS.map((ch) => (
+                  <div
+                    key={ch.name}
+                    className="p-8 border border-background/10 rounded-2xl flex items-center justify-between group hover:bg-background hover:text-foreground transition-all duration-500 cursor-pointer"
+                  >
+                    <div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] mb-2 text-background/30 group-hover:text-foreground/40 transition-colors">
+                        {ch.label}
+                      </div>
+                      <h4 className="text-xl font-bold">{ch.name}</h4>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium mb-1 group-hover:text-[#F48244]">
+                        {ch.email}
+                      </div>
+                      <div className="flex items-center justify-end gap-1 text-[10px] font-mono uppercase tracking-widest text-background/20 group-hover:text-foreground/20 transition-colors">
+                        <span>EST 09:00 - 18:00</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="mt-12 flex items-center gap-6 text-background/20">
+                  <div className="flex items-center gap-2">
+                    <Icons.Information />
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em]">
+                      ISO 27001 Certified
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icons.ExternalLink />
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em]">
+                      Status Page
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h2 className="text-3xl font-bold tracking-tight mb-4">
-              Unresolved Exception?
-            </h2>
-            <p className="text-foreground/60 max-w-md mb-8">
-              If your query falls outside standard parameters, initiate a direct
-              handshake with our engineering team.
-            </p>
-            <AButton href="/contact" showArrow>
-              Contact Support
-            </AButton>
           </div>
         </section>
 
