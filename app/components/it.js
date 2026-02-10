@@ -194,7 +194,7 @@ export default function IT() {
       <section className="py-32">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col">
-            {SERVICES.map((service, i) => (
+            {SERVICES.map((service, _i) => (
               <div
                 key={service.id}
                 className="group grid md:grid-cols-12 gap-8 md:gap-16 py-16 md:py-20 border-t border-foreground/10 transition-all hover:bg-foreground/[0.01]"
@@ -225,14 +225,14 @@ export default function IT() {
                   </p>
 
                   <div className="grid sm:grid-cols-2 gap-y-4 gap-x-8">
-                    {service.capabilities.map((cap, idx) => (
+                    {service.capabilities.map((capability, _idx) => (
                       <div
-                        key={idx}
+                        key={_idx}
                         className="flex items-center gap-3 group/item"
                       >
                         <div className="w-1 h-1 bg-foreground/20 rounded-full group-hover/item:bg-[#F48244] transition-colors" />
                         <span className="text-sm font-mono text-foreground/60 group-hover/item:text-foreground transition-colors">
-                          {cap}
+                          {capability}
                         </span>
                       </div>
                     ))}

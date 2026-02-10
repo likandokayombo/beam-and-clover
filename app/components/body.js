@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image"; // Re-import Image
-import Link from "next/link";
+// Re-import Image
 
 import AButton from "./a-button";
 import BodySvg from "./body-svg";

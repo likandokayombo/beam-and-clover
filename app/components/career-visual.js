@@ -1,19 +1,18 @@
 "use client";
 
-import { PointMaterial, Points } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 
 // --- 3D Component: Rotating Globe ---
-function RotatingGlobe({ color = "#000", pointSize = 0.04 }) {
+function RotatingGlobe({ color = "#F48244", pointSize = 0.04 }) {
   const ref = useRef();
-  const [hovered, setHover] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const speedRef = useRef(0.002); // Slower default rotation
 
   const count = 3000; // More points for density
-  const radius = 2; // Larger base radius
+  const radius = 5;
 
-  // Generate points on a sphere surface
   const positions = useMemo(() => {
     const temp = new Float32Array(count * 3);
     const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
@@ -30,7 +29,6 @@ function RotatingGlobe({ color = "#000", pointSize = 0.04 }) {
       temp[i * 3 + 1] = y * radius;
       temp[i * 3 + 2] = z * radius;
     }
-
     return temp;
   }, []);
 
@@ -38,44 +36,49 @@ function RotatingGlobe({ color = "#000", pointSize = 0.04 }) {
     if (!ref.current)
       return;
 
-    // Smooth speed transition
-    const targetSpeed = hovered ? 0.001 : 0.002;
+    // Smoothly interpolate speed based on hover
+    const targetSpeed = hovered ? 0.012 : 0.002;
     speedRef.current += (targetSpeed - speedRef.current) * 0.05;
 
-    // Rotation
     ref.current.rotation.y += speedRef.current;
-
-    // Gentle floating wobble
-    ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+    ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
   });
 
   return (
-    <group
+    <points
       ref={ref}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
     >
-      <Points positions={positions} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color={color}
-          size={pointSize}
-          sizeAttenuation={true}
-          depthWrite={false}
-          opacity={0.6}
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={count}
+          array={positions}
+          itemSize={3}
         />
-      </Points>
-    </group>
+      </bufferGeometry>
+      <pointsMaterial
+        size={pointSize}
+        color={color}
+        transparent
+        opacity={hovered ? 0.8 : 0.4}
+        sizeAttenuation
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
   );
 }
 
-export default function CareerVisual({ className, color = "#000", pointSize = 0.03 }) {
+export default function CareerVisual() {
   return (
-    <div className={`w-full h-full relative ${className}`}>
-      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
-        {/* <ambientLight intensity={0.5} /> */}
-        <RotatingGlobe color={color} pointSize={pointSize} />
-      </Canvas>
+    <div className="w-full h-full min-h-[400px] flex items-center justify-center relative cursor-grab active:cursor-grabbing">
+      <RotatingGlobe />
+
+      {/* Decorative Overlays */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#F48244]/5 rounded-full blur-[80px]" />
+      </div>
     </div>
   );
 }

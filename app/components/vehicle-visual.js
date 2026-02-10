@@ -195,7 +195,7 @@ function generateScaleOfJustice() {
   }
   else if (r < 0.65) {
     const side = Math.random() > 0.5 ? 1 : -1;
-    let p = randomPointInSphere(0.8);
+    const p = randomPointInSphere(0.8);
     if (p.y > 0)
       p.y *= -1;
     p.add(new THREE.Vector3(side * 1.5, 0.5, 0));
@@ -225,29 +225,11 @@ function generateTrafficLight() {
   }
   else {
     const which = Math.random();
-    let yPos = which < 0.33 ? 1.2 : which < 0.66 ? 0 : -1.2;
+    const yPos = which < 0.33 ? 1.2 : which < 0.66 ? 0 : -1.2;
 
     return randomPointOnCylinder(0.5, 0.2, Math.PI / 2)
       .add(new THREE.Vector3(0, yPos, 0.8))
       .multiplyScalar(SCALE);
-  }
-}
-
-function generateLocationPin() {
-  const r = Math.random();
-
-  if (r < 0.6) {
-    const p = randomPointInSphere(1.5);
-    p.y += 1.5;
-    if (p.y < 1.5)
-      p.x *= 0.8;
-    p.z *= 0.8;
-    return p.multiplyScalar(SHAPE_SCALE);
-  }
-  else {
-    return randomPointOnCone(1.4, 2.5)
-      .add(new THREE.Vector3(0, 0.5, 0))
-      .multiplyScalar(SHAPE_SCALE);
   }
 }
 
@@ -256,21 +238,6 @@ function generateInvertedCone() {
   const p = randomPointOnCone(1.4, 2.5);
   p.y = p.y * -1 - 1.0; // lower
   return p.multiplyScalar(SHAPE_SCALE);
-}
-
-function generateCheckmark() {
-  const r = Math.random();
-
-  if (r < 0.3) {
-    return randomPointOnCylinder(0.2, 1.5, 0, -Math.PI / 4)
-      .add(new THREE.Vector3(-1.0, -0.5, 0))
-      .multiplyScalar(SHAPE_SCALE);
-  }
-  else {
-    return randomPointOnCylinder(0.2, 3.0, 0, Math.PI / 6)
-      .add(new THREE.Vector3(0.5, 0.5, 0))
-      .multiplyScalar(SHAPE_SCALE);
-  }
 }
 
 function generateTrafficCone() {

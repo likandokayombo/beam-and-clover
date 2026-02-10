@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import AButton from "./a-button";
-
 const RECENT_POSTS = [
   {
     id: 1,

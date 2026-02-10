@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function PixelTransition({
   images,
@@ -16,7 +16,7 @@ export default function PixelTransition({
   const [nextIndex, setNextIndex] = useState(1);
   const containerRef = useRef(null);
   const gridRef = useRef(null);
-  const isAnimating = useRef(false);
+  const isAnimatingRef = useRef(false);
 
   // Initialize GSAP context
   useGSAP(() => {
@@ -27,7 +27,7 @@ export default function PixelTransition({
   }, { scope: containerRef });
 
   useEffect(() => {
-    if (!isAnimating.current && gridRef.current) {
+    if (!isAnimatingRef.current && gridRef.current) {
       // Reset grid visibility after the transition is fully complete
       // and the DOM has updated with the new background image.
       // Doing this in useEffect (post-paint) prevents flickering.
@@ -38,20 +38,10 @@ export default function PixelTransition({
     }
   }, [currentIndex, images.length]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isAnimating.current)
-        return;
-      triggerTransition();
-    }, rotationDuration * 1000);
-
-    return () => clearInterval(interval);
-  }, [currentIndex, nextIndex, rotationDuration]);
-
-  const triggerTransition = () => {
+  const triggerTransition = useCallback(() => {
     if (!gridRef.current)
       return;
-    isAnimating.current = true;
+    isAnimatingRef.current = true;
 
     const cells = gridRef.current.children;
 
@@ -69,7 +59,7 @@ export default function PixelTransition({
       onComplete: () => {
         // Update the current index to match the one we just revealed
         setCurrentIndex(nextIndex);
-        isAnimating.current = false;
+        isAnimatingRef.current = false;
 
         // We do NOT reset the grid here.
         // We wait for the state update to trigger the useGSAP hook above.
@@ -77,7 +67,17 @@ export default function PixelTransition({
         // before we make the grid visible again.
       },
     });
-  };
+  }, [gridSize.cols, gridSize.rows, nextIndex]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isAnimatingRef.current)
+        return;
+      triggerTransition();
+    }, rotationDuration * 1000);
+
+    return () => clearInterval(interval);
+  }, [rotationDuration, triggerTransition]);
 
   return (
     <div ref={containerRef} className={`relative overflow-hidden ${className}`}>
@@ -100,7 +100,7 @@ export default function PixelTransition({
           gridTemplateRows: `repeat(${gridSize.rows}, 1fr)`,
         }}
       >
-        {[...new Array(gridSize.rows * gridSize.cols)].map((_, i) => {
+        {Array.from({ length: gridSize.rows * gridSize.cols }).map((_, i) => {
           const row = Math.floor(i / gridSize.cols);
           const col = i % gridSize.cols;
           return (

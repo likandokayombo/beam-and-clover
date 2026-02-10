@@ -2,7 +2,7 @@
 
 import { Text } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as THREE from "three";
 
 const PARTICLE_COUNT = 35;
@@ -60,7 +60,7 @@ function Nodes() {
 
   const spheresRef = useRef([]);
   const linesGeometryRef = useRef(null);
-  const textRefs = useRef({}); // Store refs for text components
+  const textRef = useRef({}); // Store refs for text components
 
   useFrame(() => {
     // Update positions
@@ -88,8 +88,8 @@ function Nodes() {
 
       // Update Text Position (if it exists)
       // We offset the text slightly so it floats near the node
-      if (p.label && textRefs.current[i]) {
-        textRefs.current[i].position.set(
+      if (p.label && textRef.current[i]) {
+        textRef.current[i].position.set(
           p.position.x + 0.3,
           p.position.y + 0.3,
           p.position.z,
@@ -130,7 +130,7 @@ function Nodes() {
           {/* The Text Label (if applicable) */}
           {p.label && (
             <Text
-              ref={(el) => (textRefs.current[i] = el)}
+              ref={(el) => (textRef.current[i] = el)}
               fontSize={0.35}
               color={COMPANY_COLOR}
               anchorX="left"

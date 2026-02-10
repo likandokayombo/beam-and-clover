@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import AButton from "./AButton";
+import AButton from "./a-button";
 
 export default function Footer() {
   return (

@@ -3,7 +3,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react"; // changed useLayoutEffect to useEffect
+import { useEffect, useRef, useState } from "react";
 
 import AButton from "./a-button";
 
@@ -85,7 +85,6 @@ export default function ServicesCarousel() {
   }, []);
 
   useEffect(() => {
-    // Changed to useEffect
     if (!isMounted)
       return;
 
@@ -93,21 +92,17 @@ export default function ServicesCarousel() {
       const slides = slidesRef.current;
       const totalSlides = servicesData.length;
 
-      // Initial setup:
-      // Slide 1 (index 0) stays at natural position (or 0,0 since absolute).
-      // Slides 2 & 3 start shifted down by 100% and invisible.
       slides.forEach((slide, i) => {
-        if (i !== 0) {
+        if (i !== 0 && slide) {
           gsap.set(slide, { yPercent: 100, opacity: 0 });
         }
       });
 
-      // Create the timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container.current,
           start: "top top",
-          end: `+=${totalSlides * 80}%`, // Reduced from 250% to 80% for quicker transitions
+          end: `+=${totalSlides * 80}%`,
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -120,36 +115,35 @@ export default function ServicesCarousel() {
         },
       });
 
-      // Build the animation sequence
       servicesData.forEach((_, i) => {
         if (i === 0)
-          return; // Skip first slide
+          return;
 
         const currentSlide = slides[i];
         const prevSlide = slides[i - 1];
 
-        // Animate current slide UP and IN
-        tl.to(currentSlide, {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.75,
-          ease: "power2.inOut",
-        });
-
-        // Animate previous slide OUT (depth effect)
-        tl.to(
-          prevSlide,
-          {
-            opacity: 0,
-            scale: 0.95,
+        if (currentSlide && prevSlide) {
+          tl.to(currentSlide, {
+            yPercent: 0,
+            opacity: 1,
             duration: 0.75,
-          },
-          "<",
-        );
+            ease: "power2.inOut",
+          });
+
+          tl.to(
+            prevSlide,
+            {
+              opacity: 0,
+              scale: 0.95,
+              duration: 0.75,
+            },
+            "<",
+          );
+        }
       });
     }, container);
 
-    return () => ctx.revert(); // Cleanup
+    return () => ctx.revert();
   }, [isMounted]);
 
   return (
@@ -157,20 +151,6 @@ export default function ServicesCarousel() {
       ref={container}
       className="relative w-full h-screen bg-[#FAFAFA] overflow-hidden"
     >
-      {/* <div className="flex justify-left px-6 md:px-8 lg:px-12 ">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F48244]/5 border border-[#F48244]/20 text-[#F48244] text-xs font-semibold uppercase tracking-wider shadow-sm">
-          <svg
-            className="w-4 h-4"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z" />
-          </svg>
-          Our Expertise
-        </div>
-      </div> */}
-      {/* Slides Container - Absolute Stacking */}
       {servicesData.map((service, i) => (
         <div
           key={service.id}
@@ -179,9 +159,7 @@ export default function ServicesCarousel() {
           style={{ zIndex: i + 1 }}
         >
           <div className="w-full h-full flex items-center">
-            {/* Content Grid */}
             <div className="grid grid-cols-1 px-6 md:px-8 lg:px-12 lg:grid-cols-2 gap-6 md:gap-12 lg:gap-20 items-center w-full">
-              {/* Service Image - Mobile: Top, Desktop: Right */}
               <div className="order-1 lg:order-2 w-full flex justify-center lg:justify-end">
                 <div className="relative w-full aspect-video lg:aspect-square max-h-[35vh] lg:max-h-none rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/50 ring-1 ring-black/5 bg-white">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 z-10 pointer-events-none" />
@@ -196,9 +174,7 @@ export default function ServicesCarousel() {
                 </div>
               </div>
 
-              {/* Text Content - Mobile: Bottom, Desktop: Left */}
               <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 order-2 lg:order-1">
-                {/* Label */}
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold tracking-wider text-[#F48244] bg-[#F48244]/10 ring-1 ring-[#F48244]/20">
                     {service.label}
@@ -206,17 +182,14 @@ export default function ServicesCarousel() {
                   <div className="h-px w-12 bg-gradient-to-r from-[#F48244]/40 to-transparent"></div>
                 </div>
 
-                {/* Title */}
                 <h2 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-bold leading-[1.1] tracking-tight text-[#171717]">
                   {service.title}
                 </h2>
 
-                {/* Description */}
                 <p className="text-sm md:text-lg text-gray-600 leading-relaxed md:leading-relaxed max-w-xl">
                   {service.description}
                 </p>
 
-                {/* Features List */}
                 <div className="flex flex-wrap gap-2">
                   {service.features.map((feat, idx) => (
                     <span
@@ -228,7 +201,6 @@ export default function ServicesCarousel() {
                   ))}
                 </div>
 
-                {/* CTA Button */}
                 <div className="mt-2 md:mt-4">
                   <AButton href={service.href} showArrow>
                     Learn More
